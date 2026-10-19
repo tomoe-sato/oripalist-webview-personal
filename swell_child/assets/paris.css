@@ -1,0 +1,248 @@
+/*!
+ * パリス（公式キャラクター）のトップページ用パーツ
+ */
+
+@keyframes paris-hop {
+	0% {
+		opacity: 0;
+		transform: translateY(8px) scale(0.96);
+	}
+	60% {
+		opacity: 1;
+		transform: translateY(-4px) scale(1.02);
+	}
+	100% {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+@keyframes paris-bob {
+	0%,
+	100% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(-4px);
+	}
+}
+
+/* ========================================
+   パリスのあいさつ [paris_hero]
+   ======================================== */
+.paris-hero {
+	margin: 0 0 1.5rem;
+	padding: 18px 14px 14px;
+	background: #FFF3E7;
+	border-radius: 20px;
+}
+
+.paris-hero__label {
+	display: inline-block;
+	margin: 0;
+	padding: 3px 10px;
+	font-size: 0.75rem;
+	font-weight: 700;
+	line-height: 1.4;
+	color: #3d2a1a;
+	background: #fff;
+	border: 2px solid #FF7100;
+	border-radius: 999px;
+}
+
+.paris-hero__body {
+	display: flex;
+	align-items: flex-end;
+	gap: 2px;
+	margin-top: 10px;
+}
+
+.paris-hero__paris {
+	flex: 0 0 auto;
+	width: 136px;
+	height: 150px;
+	padding: 0;
+	cursor: pointer;
+	background: transparent;
+	border: 0;
+}
+
+.paris-hero__img {
+	display: block;
+	width: 136px;
+	height: 150px;
+	object-fit: contain;
+	object-position: bottom;
+}
+
+.paris-hero__img.is-hop {
+	animation: paris-hop 0.5s ease both;
+}
+
+.paris-hero__bubble {
+	position: relative;
+	flex: 1 1 auto;
+	margin: 0 0 46px;
+	padding: 12px 14px;
+	font-size: 0.9375rem;
+	font-weight: 700;
+	line-height: 1.5;
+	color: #1f2430;
+	background: #fff;
+	border: 3px solid #3d2a1a;
+	border-radius: 16px;
+}
+
+/* 吹き出しのしっぽ（外枠と内側の2枚重ね） */
+.paris-hero__bubble::before,
+.paris-hero__bubble::after {
+	position: absolute;
+	width: 0;
+	height: 0;
+	content: "";
+	border-style: solid;
+	border-color: transparent;
+}
+
+.paris-hero__bubble::before {
+	bottom: 14px;
+	left: -12px;
+	border-width: 9px 12px 9px 0;
+	border-right-color: #3d2a1a;
+}
+
+.paris-hero__bubble::after {
+	bottom: 16px;
+	left: -7px;
+	border-width: 7px 9px 7px 0;
+	border-right-color: #fff;
+}
+
+.paris-hero__dots {
+	display: flex;
+	justify-content: center;
+	gap: 6px;
+	margin-top: 8px;
+}
+
+.paris-hero__dot {
+	display: block;
+	width: 6px;
+	height: 6px;
+	background: #FFDAB3;
+	border-radius: 999px;
+	transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.paris-hero__dot.is-current {
+	width: 18px;
+	background: #FF7100;
+}
+
+/* ========================================
+   診断への呼びかけ [paris_shindan]
+   ======================================== */
+.paris-shindan {
+	margin: 1.5rem 0;
+	padding: 16px;
+	background: #D0F1FF;
+	border-radius: 20px;
+}
+
+.paris-shindan__body {
+	display: flex;
+	align-items: flex-end;
+	gap: 6px;
+}
+
+.paris-shindan__img {
+	flex: 0 0 auto;
+	width: 112px;
+	height: 112px;
+	object-fit: contain;
+	object-position: bottom;
+	animation: paris-bob 2.8s ease-in-out infinite;
+}
+
+.paris-shindan__title {
+	margin: 0 0 4px;
+	font-size: 1.0625rem;
+	font-weight: 800;
+	line-height: 1.4;
+	color: #1f2430;
+}
+
+.paris-shindan__desc {
+	margin: 0 0 8px;
+	font-size: 0.75rem;
+	line-height: 1.5;
+	color: #3f4654;
+}
+
+.paris-shindan__btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	min-height: 48px;
+	margin-top: 12px;
+	font-size: 0.9375rem;
+	font-weight: 700;
+	color: #fff;
+	text-decoration: none;
+	background: #0069E1;
+	border-radius: 14px;
+	box-shadow: 0 4px 0 #004FDE;
+	transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.paris-shindan__btn:hover {
+	color: #fff;
+}
+
+.paris-shindan__btn:active {
+	transform: translateY(3px);
+	box-shadow: 0 1px 0 #004FDE;
+}
+
+/* ========================================
+   見出しの横のパリス .paris-heading
+   SWELLの見出し装飾を外し、シンプルな見出しにする
+   ======================================== */
+.post_content .paris-heading,
+.paris-heading {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 0;
+	font-size: 1.125rem;
+	font-weight: 800;
+	color: #1f2430;
+	background: none;
+	border: 0;
+	box-shadow: none;
+}
+
+.post_content .paris-heading::before,
+.post_content .paris-heading::after,
+.paris-heading::before,
+.paris-heading::after {
+	display: none;
+	content: none;
+}
+
+.paris-heading__img {
+	flex: 0 0 auto;
+	width: 44px;
+	height: 44px;
+	object-fit: contain;
+	animation: paris-bob 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.paris-hero__img.is-hop,
+	.paris-shindan__img,
+	.paris-heading__img {
+		animation: none;
+	}
+}

@@ -4,6 +4,7 @@
 
 require_once get_stylesheet_directory() . '/inc/oripa-helpers.php';
 require_once get_stylesheet_directory() . '/inc/oripa-listings.php';
+require_once get_stylesheet_directory() . '/inc/paris.php';
 
 /**
  * アプリ内遷移用カスタムスキームを esc_url() で許可する
