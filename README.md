@@ -23,10 +23,14 @@ swell_child/
 ## 設置
 
 1. `swell_child/` を `wp-content/themes/` にアップロードし、テーマを有効化します。
-2. `wp-config.php` に WebView 用の秘密キーを追加します（アプリ側の `X-Oripalist-App` ヘッダーの値と同じもの）。
+2. WebView サイトの `wp-config.php`（`oripa-list.jp/public_html/web.oripa-list.jp/wp-config.php`）に、WebView 用の秘密キーを追加します（アプリ側の `X-Oripalist-App` ヘッダーの値と同じもの）。
+   **必ず `require_once ABSPATH . 'wp-settings.php';` より上に書いてください。** 下に書くとテーマより後に読み込まれ、キーが未設定扱いになってアプリからのアクセスも 403 になります。
 
    ```php
-   define( 'ORIPALIST_APP_SECRET', 'ここに秘密キー' );
+   define( 'ORIPALIST_APP_SECRET', 'ここに秘密キー' );   // ← ここに書く
+
+   /* That's all, stop editing! Happy publishing. */
+   require_once ABSPATH . 'wp-settings.php';
    ```
 
    > **注意:** この定義がないと、管理画面・REST API・静的ファイル以外のページはすべて 403 になります。
