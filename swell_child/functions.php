@@ -3,6 +3,7 @@
 /* 子テーマのfunctions.phpは、親テーマのfunctions.phpより先に読み込まれることに注意してください。 */
 
 require_once get_stylesheet_directory() . '/inc/oripa-helpers.php';
+require_once get_stylesheet_directory() . '/inc/oripa-listings.php';
 
 /**
  * アプリ内遷移用カスタムスキームを esc_url() で許可する
@@ -39,10 +40,10 @@ define( 'ORIPA_TAXONOMY_TAG', 'tags' );
 define( 'ORIPA_TAXONOMY_TYPE', 'oripa_type' ); // オリパタイプ（※実際のスラッグに合わせて変更）
 
 /**
- * ショップ詳細ページはサイドバーなし1カラム
+ * ショップ詳細ページ・一覧ページはサイドバーなし1カラム
  */
 add_filter( 'swell_is_show_sidebar', function ( $show ) {
-	if ( is_singular( 'shop' ) ) {
+	if ( is_singular( 'shop' ) || is_post_type_archive( [ 'shop', 'product' ] ) || is_tax( ORIPA_TAXONOMY_TAG ) ) {
 		return false;
 	}
 	return $show;
@@ -388,3 +389,36 @@ add_action('init', function () {
         ['response' => 403]
     );
 });
+/**
+ * 動きのある表示（自動スワイプのカルーセル・フェードイン）用アセット読み込み
+ *
+ * ブロックの「追加CSSクラス」に以下を指定すると有効になる。
+ * - oripa-slider : ギャラリーブロックを自動スワイプのカルーセルにする
+ * - oripa-reveal : 画面に入ったらフェードインさせる
+ */
+function oripa_motion_enqueue_assets() {
+	$theme_dir = get_stylesheet_directory();
+	$theme_uri = get_stylesheet_directory_uri();
+	$version   = (string) max(
+		filemtime( $theme_dir . '/assets/oripa-motion.css' ),
+		filemtime( $theme_dir . '/assets/oripa-motion.js' )
+	);
+
+	wp_enqueue_style( 'oripa-motion', $theme_uri . '/assets/oripa-motion.css', [], $version );
+	wp_enqueue_style(
+		'oripa-listings',
+		$theme_uri . '/assets/oripa-listings.css',
+		[],
+		(string) filemtime( $theme_dir . '/assets/oripa-listings.css' )
+	);
+	wp_enqueue_script( 'oripa-motion', $theme_uri . '/assets/oripa-motion.js', [], $version, true );
+}
+add_action( 'wp_enqueue_scripts', 'oripa_motion_enqueue_assets' );
+
+/**
+ * JSが有効な場合のみフェードイン前の要素を隠すためのクラスを付与
+ * （JSが動かない環境で要素が見えなくなるのを防ぐ）
+ */
+add_action( 'wp_head', function () {
+	echo "<script>document.documentElement.classList.add('oripa-motion');</script>\n";
+}, 1 );
