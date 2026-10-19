@@ -342,6 +342,11 @@ add_action('init', function () {
         return;
     }
 
+    // ログイン中の編集者・管理者はPCからでも閲覧・プレビューできるように通す
+    if (is_user_logged_in() && current_user_can('edit_posts')) {
+        return;
+    }
+
     // 秘密キー未設定時は空文字同士の照合で全員通過してしまうため、ブロックする
     if ($secret_key === '') {
         status_header(403);

@@ -88,14 +88,14 @@
 	padding: 0;
 	border: 0;
 	border-radius: 999px;
-	background: #d0d4da;
+	background: #FFDAB3;
 	cursor: pointer;
 	transition: width 0.3s ease, background-color 0.3s ease;
 }
 
 .oripa-slider__dot[aria-current="true"] {
 	width: 22px;
-	background: #f58220;
+	background: #FF7100;
 }
 
 /* ========================================
