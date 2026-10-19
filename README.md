@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# オリパリスト WebView（SWELL 子テーマ）
 
-## Getting Started
+オリパリストアプリの WebView で表示する WordPress サイト用の SWELL 子テーマです。
 
-First, run the development server:
+## 構成
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+swell_child/
+├── style.css              # テーマ情報・商品カードのスタイル
+├── functions.php          # ショートコード、アセット読み込み、WebView アクセス制御
+├── inc/oripa-helpers.php  # ショップ詳細の商品一覧などのヘルパー
+├── single-shop.php        # ショップ詳細テンプレート
+├── single-product.php     # 商品詳細テンプレート
+└── assets/                # オリパ診断チャートの CSS / JS
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 前提
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- 親テーマ **SWELL**（有料テーマのため、このリポジトリには含めていません）
+- **Advanced Custom Fields**（`get_field()` を使用）
+- カスタム投稿タイプ `shop` / `product`、タクソノミー `shops` / `tags` / `oripa_type` / `tcgtitle`（テーマ外のプラグイン等で登録）
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 設置
 
-## Learn More
+1. `swell_child/` を `wp-content/themes/` にアップロードし、テーマを有効化します。
+2. `wp-config.php` に WebView 用の秘密キーを追加します（アプリ側の `X-Oripalist-App` ヘッダーの値と同じもの）。
 
-To learn more about Next.js, take a look at the following resources:
+   ```php
+   define( 'ORIPALIST_APP_SECRET', 'ここに秘密キー' );
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   > **注意:** この定義がないと、管理画面・REST API・静的ファイル以外のページはすべて 403 になります。
+   > 秘密キーは公開リポジトリにコミットしないでください。
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## ショートコード
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `[oripa_product id="投稿ID"]` … 商品カードを1件表示
+- `[oripa_products type="オリパタイプのスラッグ" limit="6"]` … オリパタイプ別の商品カード一覧
