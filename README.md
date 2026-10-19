@@ -36,3 +36,22 @@ swell_child/
 
 - `[oripa_product id="投稿ID"]` … 商品カードを1件表示
 - `[oripa_products type="オリパタイプのスラッグ" limit="6"]` … オリパタイプ別の商品カード一覧
+
+## 自動デプロイ（GitHub Actions → Xserver）
+
+`main` ブランチの `swell_child/` に変更が入ると、`.github/workflows/deploy.yml` が SSH（rsync）で Xserver の
+`~/oripa-list.jp/public_html/web.oripa-list.jp/wp-content/themes/swell_child/` に反映します。
+Actions タブの「Deploy theme to Xserver」→「Run workflow」から手動実行もできます。
+
+### 必要な GitHub Secrets（Settings → Secrets and variables → Actions）
+
+| 名前 | 値 |
+|---|---|
+| `XSERVER_HOST` | SSH ホスト名（例: `sv12345.xserver.jp`） |
+| `XSERVER_USER` | サーバー ID |
+| `XSERVER_SSH_KEY` | デプロイ用 SSH 秘密鍵（パスフレーズなし） |
+
+### 注意
+
+- サーバー上で削除されたファイルは同期しません（Git から消したファイルはサーバー側で手動削除）。
+- 管理画面のテーマファイルエディターで直接編集した内容は、次回のデプロイで上書きされます。
