@@ -1,0 +1,654 @@
+/*!
+ * オリパ診断チャート（4タイプ判定版）
+ * for オリパリスト WebView
+ * version: 1.2
+ *
+ * ブランドカラー
+ *   オレンジ系: #f15a24 / #f7931e / #f2f2f2
+ *   ブルー系:   #0092fc / #00cfff / #6555ff
+ *   ※オレンジ系とブルー系は同一グラデーション内で混ぜない
+ */
+
+ #oripa-shindan {
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", "Meiryo", "Noto Sans JP", sans-serif;
+    color: #1a2a3a;
+    background: #f2f2f2;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+}
+
+#oripa-shindan *,
+#oripa-shindan *::before,
+#oripa-shindan *::after {
+    box-sizing: border-box;
+}
+
+.ops {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 16px;
+}
+
+/* ===== Intro ===== */
+.ops-intro {
+    text-align: center;
+    padding: 12px 0;
+}
+
+/* 表紙画像 */
+.ops-intro__cover {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 0 auto 24px;
+    border-radius: 20px;
+    box-shadow: 0 8px 24px rgba(26, 42, 58, 0.12);
+}
+
+/* ===== Buttons ===== */
+.ops-btn {
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 15px 40px;
+    font-size: 1rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+/* CTA: オレンジグラデーション #f15a24 → #f7931e */
+.ops-btn--primary {
+    background: linear-gradient(135deg, #f15a24 0%, #f7931e 100%);
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(241, 90, 36, 0.32);
+}
+
+@media (hover: hover) {
+    .ops-btn--primary:hover {
+        transform: translateY(-2px);
+        filter: saturate(1.05) brightness(1.03);
+        box-shadow: 0 10px 24px rgba(247, 147, 30, 0.42);
+    }
+}
+
+.ops-btn:active {
+    transform: scale(0.97);
+}
+
+/* ===== Quiz ===== */
+.ops-quiz {
+    background: #fff;
+    border-radius: 24px;
+    padding: 20px 16px;
+    box-shadow: 0 8px 24px rgba(26, 42, 58, 0.06);
+}
+
+.ops-progress {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.ops-progress__label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #0092fc;
+    min-width: 7.5rem;
+    letter-spacing: 0.02em;
+}
+
+.ops-progress__track {
+    flex: 1;
+    height: 8px;
+    background: #e6eaf2;
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+/* 進捗バー: ブルーグラデーション #0092fc → #6555ff */
+.ops-progress__fill {
+    height: 100%;
+    background: linear-gradient(90deg, #0092fc 0%, #6555ff 100%);
+    border-radius: 99px;
+    transition: width 0.35s ease;
+}
+
+/* 質問カード: ブルー単色の薄いティント */
+.ops-question-card {
+    background: linear-gradient(135deg, rgba(0, 146, 252, 0.05) 0%, rgba(0, 207, 255, 0.08) 100%);
+    border-radius: 20px;
+    padding: 1.25rem 1rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 4px 16px rgba(26, 42, 58, 0.06);
+}
+
+.ops-question {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    line-height: 1.65;
+    margin: 0;
+    color: #1a2a3a;
+}
+
+.ops-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ops-option {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    background: #fff;
+    border: 1.5px solid #e3e7ee;
+    border-radius: 18px;
+    padding: 15px 16px;
+    text-align: left;
+    font-family: inherit;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: #1a2a3a;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(26, 42, 58, 0.05);
+    transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+/* hover: オレンジでアクセント＋浮き上がり */
+@media (hover: hover) {
+    .ops-option:hover {
+        transform: translateY(-2px);
+        border-color: rgba(247, 147, 30, 0.55);
+        box-shadow: 0 8px 20px rgba(26, 42, 58, 0.1);
+    }
+}
+
+/* 選択時: オレンジ系で強調 */
+.ops-option:active {
+    transform: scale(0.98);
+    background: linear-gradient(135deg, rgba(241, 90, 36, 0.07) 0%, rgba(247, 147, 30, 0.12) 100%);
+    border-color: #f15a24;
+    box-shadow: 0 4px 14px rgba(241, 90, 36, 0.2);
+}
+
+/* A/B/C/D バッジ: ブルーグラデーション #0092fc → #00cfff */
+.ops-option__letter {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0092fc 0%, #00cfff 100%);
+    color: #fff;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 146, 252, 0.28);
+}
+
+.ops-option__text {
+    flex: 1;
+}
+
+.ops-back {
+    background: transparent;
+    border: none;
+    color: #5a6b7d;
+    font-size: 0.8125rem;
+    margin-top: 16px;
+    padding: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: color 0.2s ease;
+}
+
+.ops-back:active,
+.ops-back:hover {
+    color: #0092fc;
+}
+
+/* ===== Result ===== */
+.ops-fade-in {
+    animation: opsFadeIn 0.5s ease forwards;
+}
+
+@keyframes opsFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.ops-result__eyebrow {
+    text-align: center;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #0092fc;
+    margin-bottom: 16px;
+}
+
+.ops-result__lead {
+    text-align: center;
+    font-size: 0.9375rem;
+    color: #5a6b7d;
+    margin: 0 0 16px;
+}
+
+.ops-result__card {
+    color: #fff;
+    border-radius: 24px;
+    padding: 32px 20px;
+    text-align: center;
+    margin-bottom: 24px;
+    overflow: hidden;
+    position: relative;
+    isolation: isolate;
+    border: 2px solid transparent;
+    background:
+        var(--ops-grad, linear-gradient(135deg, #0092fc 0%, #00cfff 100%)) padding-box,
+        linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.25) 45%, rgba(255, 255, 255, 0.05) 100%) border-box;
+    box-shadow:
+        0 14px 30px var(--ops-glow, rgba(26, 42, 58, 0.2)),
+        inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* 上部の白い光沢ハイライト */
+.ops-result__card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 32%, rgba(255, 255, 255, 0) 58%);
+}
+
+.ops-result__card > * {
+    position: relative;
+    z-index: 1;
+}
+
+@media (hover: hover) {
+    .ops-result:hover .ops-result__card {
+        transform: translateY(-3px);
+        box-shadow:
+            0 22px 42px var(--ops-glow, rgba(26, 42, 58, 0.26)),
+            inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    }
+}
+
+/* タイプアイコン背景（円形・光沢） */
+.ops-result__emoji {
+    width: 84px;
+    height: 84px;
+    margin: 0 auto 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.75rem;
+    line-height: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.2) 55%, rgba(255, 255, 255, 0.06) 100%);
+    box-shadow:
+        inset 0 1px 4px rgba(255, 255, 255, 0.55),
+        inset 0 -3px 8px rgba(0, 0, 0, 0.12),
+        0 6px 14px rgba(0, 0, 0, 0.14);
+}
+
+.ops-result__name {
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin: 0;
+    line-height: 1.25;
+}
+
+.ops-result__tagline {
+    font-size: 0.9375rem;
+    margin-top: 10px;
+    opacity: 0.95;
+    font-weight: 600;
+}
+
+/* タイプ別 結果画像 */
+.ops-result__image {
+    display: block;
+    width: 100%;
+    max-width: 360px;
+    height: auto;
+    margin: 0 auto 20px;
+    border-radius: 18px;
+    box-shadow: 0 6px 18px rgba(26, 42, 58, 0.12);
+}
+
+.ops-result__desc {
+    font-size: 0.9375rem;
+    line-height: 1.8;
+    color: #1a2a3a;
+    margin: 0 0 20px;
+    padding: 0 4px;
+}
+
+/* タイプ説明エリア（おすすめの遊び方） */
+.ops-result__advice {
+    border-radius: 16px;
+    padding: 16px 18px;
+    margin-bottom: 24px;
+    background: #fff;
+    border: 1px solid var(--ops-soft, rgba(0, 146, 252, 0.18));
+    border-left: 4px solid var(--ops-main, #0092fc);
+    box-shadow: 0 4px 16px rgba(26, 42, 58, 0.06);
+}
+
+/* タイプバッジ */
+.ops-result__advice-label {
+    display: inline-block;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    padding: 0.25rem 0.7rem;
+    letter-spacing: 0.02em;
+    color: #fff;
+    border-radius: 999px;
+    background: var(--ops-grad, linear-gradient(135deg, #0092fc 0%, #00cfff 100%));
+    box-shadow: 0 2px 6px var(--ops-glow, rgba(0, 146, 252, 0.3));
+}
+
+.ops-result__advice p {
+    font-size: 0.875rem;
+    line-height: 1.75;
+    color: #1a2a3a;
+    margin: 0;
+}
+
+.ops-result__scores {
+    margin-bottom: 24px;
+    padding: 16px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 16px rgba(26, 42, 58, 0.06);
+}
+
+.ops-result__scores-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #5a6b7d;
+    margin-bottom: 12px;
+    letter-spacing: 0.02em;
+}
+
+.ops-score-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.ops-score-row:last-child {
+    margin-bottom: 0;
+}
+
+.ops-score-row__name {
+    font-size: 0.8125rem;
+    color: #6b7a89;
+    min-width: 6.5rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.ops-score-row.is-win .ops-score-row__name {
+    color: var(--ops-deep, #1a2a3a);
+    font-weight: 700;
+}
+
+.ops-score-row__track {
+    flex: 1;
+    height: 10px;
+    background: #e6eaf2;
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+/* スコアバー（通常）: ブルーグラデーション #0092fc → #00cfff */
+.ops-score-row__fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, #0092fc 0%, #00cfff 100%);
+    transition: width 0.6s ease;
+}
+
+/* スコアバー（勝者）: タイプ専用グラデーションで強調 */
+.ops-score-row.is-win .ops-score-row__fill {
+    background: var(--ops-grad, linear-gradient(90deg, #f15a24 0%, #f7931e 100%));
+}
+
+.ops-score-row__value {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    min-width: 2.5rem;
+    text-align: right;
+    color: #1a2a3a;
+}
+
+.ops-retry {
+    display: block;
+    width: 100%;
+    background: #fff;
+    border: 1.5px solid #cfe3ff;
+    color: #1a2a3a;
+    border-radius: 16px;
+    padding: 14px;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: background-color 0.2s ease, transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+@media (hover: hover) {
+    .ops-retry:hover {
+        border-color: #0092fc;
+        box-shadow: 0 4px 14px rgba(0, 146, 252, 0.15);
+    }
+}
+
+.ops-retry:active {
+    background: #f2f2f2;
+    transform: scale(0.98);
+}
+
+/* ============================================================
+ * 診断結果タイプ別カラー（ブランドカラーとは別の専用レアリティ配色）
+ *   --ops-grad : ハイライト→メイン→シャドウの3層グラデーション
+ *   --ops-main : メインカラー（枠・アクセント）
+ *   --ops-deep : シャドウカラー（白背景上のテキスト用）
+ *   --ops-glow : ドロップシャドウ用の淡い発色
+ *   --ops-soft : 薄いタイプ枠線
+ * ============================================================ */
+
+/* 🌱 マイルド: 安心感・成長・初心者向け */
+.ops-type-mild {
+    --ops-grad: linear-gradient(135deg, #B8F58C 0%, #7ED957 55%, #4FAE28 100%);
+    --ops-main: #7ED957;
+    --ops-deep: #4FAE28;
+    --ops-glow: rgba(79, 174, 40, 0.32);
+    --ops-soft: rgba(126, 217, 87, 0.25);
+}
+
+/* 🔁 ループ: 安定・継続・効率 */
+.ops-type-loop {
+    --ops-grad: linear-gradient(135deg, #63D8FF 0%, #0092FC 55%, #0057D8 100%);
+    --ops-main: #0092FC;
+    --ops-deep: #0057D8;
+    --ops-glow: rgba(0, 87, 216, 0.32);
+    --ops-soft: rgba(0, 146, 252, 0.25);
+}
+
+/* 🔥 ハイリスク: 爆アド・一撃・勝負 */
+.ops-type-highrisk {
+    --ops-grad: linear-gradient(135deg, #FFB066 0%, #F15A24 55%, #C13200 100%);
+    --ops-main: #F15A24;
+    --ops-deep: #C13200;
+    --ops-glow: rgba(193, 50, 0, 0.32);
+    --ops-soft: rgba(241, 90, 36, 0.25);
+}
+
+/* 🎪 イベント: 祭り・限定・特別感 */
+.ops-type-event {
+    --ops-grad: linear-gradient(135deg, #FFA4F3 0%, #FF4FD8 55%, #B526A0 100%);
+    --ops-main: #FF4FD8;
+    --ops-deep: #B526A0;
+    --ops-glow: rgba(181, 38, 160, 0.32);
+    --ops-soft: rgba(255, 79, 216, 0.25);
+}
+
+/* タイプ名: カード上の白文字に立体感を補強 */
+.ops-result__name {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+}
+
+/* ===== Shortcode output container ===== */
+.oripa-shortcode-output {
+    max-width: 480px;
+    margin: 24px auto 0;
+    padding: 0 16px;
+}
+
+.oripa-shortcode-output[hidden] {
+    display: none !important;
+}
+
+/* ============================================================
+ * 診断結果のシェア（SNS/LINE共有・画像保存・投稿文コピー）
+ * ============================================================ */
+.ops-share {
+    max-width: 400px;
+    margin: 0 auto 20px;
+}
+
+/* メインボタン: 診断結果をシェアする（オレンジ系ブランドカラー） */
+.ops-share__main {
+    display: block;
+    width: 100%;
+    min-height: 54px;
+    padding: 16px;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.4;
+    color: #fff;
+    background: linear-gradient(135deg, #f15a24 0%, #f7931e 100%);
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(241, 90, 36, 0.32);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+@media (hover: hover) {
+    .ops-share__main:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.04) saturate(1.05);
+        box-shadow: 0 12px 26px rgba(247, 147, 30, 0.42);
+    }
+}
+
+.ops-share__main:active {
+    transform: translateY(2px);
+    box-shadow: 0 3px 10px rgba(241, 90, 36, 0.3);
+}
+
+/* サブボタン: 画像保存 / 投稿文コピー */
+.ops-share__sub {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.ops-share__btn {
+    flex: 1 1 150px;
+    min-height: 48px;
+    padding: 12px 10px;
+    font-family: inherit;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    line-height: 1.4;
+    color: #1a2a3a;
+    background: #fff;
+    border: 1.5px solid #e3e7ee;
+    border-radius: 14px;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(26, 42, 58, 0.05);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+@media (hover: hover) {
+    .ops-share__btn:hover {
+        border-color: #0092fc;
+        box-shadow: 0 4px 14px rgba(0, 146, 252, 0.15);
+    }
+}
+
+.ops-share__btn:active {
+    transform: scale(0.98);
+    background: #f2f2f2;
+}
+
+/* 操作結果の案内トースト */
+.ops-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    z-index: 9999;
+    width: calc(100% - 32px);
+    max-width: 400px;
+    padding: 12px 16px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1.6;
+    text-align: center;
+    color: #fff;
+    background: rgba(26, 42, 58, 0.92);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(26, 42, 58, 0.25);
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, 12px);
+    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
+}
+
+.ops-toast.is-visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
+}
+
+/* 商品カード：タイトルなし（残口数のみ）の行
+   このCSSは style.css より先に読み込まれるため、
+   .oripa-card__title-row の justify-content を上書きできるよう詳細度を上げている */
+.oripa-card__title-row.oripa-card__title-row--stock-only {
+    justify-content: flex-end;
+}
+
+.oripa-card__title-row.oripa-card__title-row--stock-only .oripa-card__stock {
+    margin: 0;
+}

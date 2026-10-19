@@ -1,0 +1,44 @@
+name: Deploy theme to Xserver
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "swell_child/**"
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      SSH_PORT: "10022"
+      # ホームディレクトリからの相対パス
+      REMOTE_DIR: "oripa-list.jp/public_html/web.oripa-list.jp/wp-content/themes/swell_child/"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up SSH key
+        env:
+          SSH_KEY: ${{ secrets.XSERVER_SSH_KEY }}
+          SSH_HOST: ${{ secrets.XSERVER_HOST }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -p "$SSH_PORT" "$SSH_HOST" >> ~/.ssh/known_hosts
+
+      - name: Deploy with rsync
+        env:
+          SSH_HOST: ${{ secrets.XSERVER_HOST }}
+          SSH_USER: ${{ secrets.XSERVER_USER }}
+        run: |
+          rsync -rlcv \
+            --exclude ".DS_Store" \
+            -e "ssh -p $SSH_PORT -i ~/.ssh/id_deploy" \
+            swell_child/ "$SSH_USER@$SSH_HOST:$REMOTE_DIR"
