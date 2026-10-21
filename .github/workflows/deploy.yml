@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "swell_child/**"
+      - "server-monitor/**"
       - ".github/workflows/deploy.yml"
   workflow_dispatch:
 
@@ -42,3 +43,14 @@ jobs:
             --exclude ".DS_Store" \
             -e "ssh -p $SSH_PORT -i ~/.ssh/id_deploy" \
             swell_child/ "$SSH_USER@$SSH_HOST:$REMOTE_DIR"
+
+      - name: Deploy server monitor (wp-watch)
+        env:
+          SSH_HOST: ${{ secrets.XSERVER_HOST }}
+          SSH_USER: ${{ secrets.XSERVER_USER }}
+        run: |
+          # 公開ディレクトリの外（~/wp-watch/）に置く。サーバー上の設定ファイルは上書きしない
+          rsync -rlcv \
+            --exclude "wp-watch.conf" \
+            -e "ssh -p $SSH_PORT -i ~/.ssh/id_deploy" \
+            server-monitor/ "$SSH_USER@$SSH_HOST:wp-watch/"

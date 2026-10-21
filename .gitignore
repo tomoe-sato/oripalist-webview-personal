@@ -2,3 +2,4 @@
 Thumbs.db
 *.log
 wp-config.php
+server-monitor/wp-watch.conf
