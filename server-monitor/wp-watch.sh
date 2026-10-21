@@ -22,6 +22,7 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 # ---- 設定の初期値（wp-watch.conf で上書き） ----
 SEARCH_ROOTS="$HOME"
 MAX_DEPTH=5
+EXCLUDE_SITES=""
 STATE_DIR="$HOME/.wp-watch"
 PHP_BIN="php"
 MAIL_TO=""
@@ -100,7 +101,7 @@ find_sites() {
 		[ -d "$root" ] || continue
 		find "$root" -maxdepth "$MAX_DEPTH" -type f -name wp-settings.php \
 			-not -path '*/wp-content/*' -not -path "$STATE_DIR/*" 2>/dev/null
-	done | sed 's#/wp-settings\.php$##' | sort -u
+	done | sed 's#/wp-settings\.php$##' | sort -u | grep -vxF -f <(printf '%s\n' $EXCLUDE_SITES) || true
 }
 
 snapshot_ssh_keys() {

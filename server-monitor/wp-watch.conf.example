@@ -21,6 +21,8 @@ DISCORD_WEBHOOK_URL=""
 SEARCH_ROOTS="$HOME"
 # 探す深さ（~/ドメイン/public_html/サブドメイン/ まで届けば十分）
 MAX_DEPTH=5
+# 見回りから外す WordPress（空白区切り。使っていない・壊れているものなど）
+EXCLUDE_SITES=""
 
 # ~/.ssh/authorized_keys の変更を通知する（1 = する）
 WATCH_SSH_KEYS=1
@@ -30,8 +32,8 @@ WATCH_OS_USERS=0
 # ---- その他 ----
 
 # PHP 7.0 以上で mysqli が使える php。Xserver では既定の php が古い場合があるのでバージョン付きを指定
-# （例: /usr/bin/php8.2。SSH で `ls /usr/bin/php*` を実行すると使えるものが分かります）
-PHP_BIN="php"
+# （例: /usr/bin/php8.3。SSH で `ls /usr/bin/php*` を実行すると使えるものが分かります）
+PHP_BIN="/usr/bin/php8.3"
 
 # 前回の状態とログの保存先（公開ディレクトリの外にしてください）
 STATE_DIR="$HOME/.wp-watch"
