@@ -2,7 +2,8 @@
 /**
  * WordPress 1サイト分の「プラグイン」と「ユーザー」の状態をテキストで出力する（wp-watch.sh から呼ばれる）。
  *
- * 使い方: php wp-snapshot.php <wp-settings.php があるディレクトリ>
+ * 使い方: php wp-snapshot.php <wp-settings.php があるディレクトリ> [--detail]
+ *   --detail … ユーザーの登録日時も出力する（点検用。wp-watch.sh の比較には使わない）
  *
  * - WordPress 本体は読み込まず、ファイル一覧と DB を直接見ます。
  *   不正プラグインは all_plugins / pre_user_query フィルターで管理画面や wp-cli から
@@ -20,7 +21,8 @@ if ( version_compare( PHP_VERSION, '7.0.0', '<' ) ) {
 	exit( 2 );
 }
 
-$root = isset( $argv[1] ) ? rtrim( $argv[1], '/' ) : '';
+$root   = isset( $argv[1] ) ? rtrim( $argv[1], '/' ) : '';
+$detail = in_array( '--detail', $argv, true );
 if ( $root === '' || ! is_file( $root . '/wp-settings.php' ) ) {
 	fwrite( STDERR, "WordPress のディレクトリを指定してください: {$root}\n" );
 	exit( 2 );
@@ -86,7 +88,7 @@ mysqli_set_charset( $db, 'utf8mb4' );
 $like  = str_replace( '_', '\\_', $prefix ) . '%capabilities';
 $users = mysqli_query(
 	$db,
-	"SELECT u.ID, u.user_login, u.user_email, m.meta_key, m.meta_value
+	"SELECT u.ID, u.user_login, u.user_email, u.user_registered, m.meta_key, m.meta_value
 	   FROM `{$prefix}users` u
 	   LEFT JOIN `{$prefix}usermeta` m ON m.user_id = u.ID AND m.meta_key LIKE '" . mysqli_real_escape_string( $db, $like ) . "'
 	  ORDER BY u.ID"
@@ -99,7 +101,7 @@ $found = array();
 while ( $row = mysqli_fetch_assoc( $users ) ) {
 	$id = $row['ID'];
 	if ( ! isset( $found[ $id ] ) ) {
-		$found[ $id ] = array( 'login' => $row['user_login'], 'email' => $row['user_email'], 'roles' => array() );
+		$found[ $id ] = array( 'login' => $row['user_login'], 'email' => $row['user_email'], 'registered' => $row['user_registered'], 'roles' => array() );
 	}
 	$key = (string) $row['meta_key'];
 	if ( $key === $prefix . 'capabilities' ) {
@@ -121,6 +123,9 @@ while ( $row = mysqli_fetch_assoc( $users ) ) {
 foreach ( $found as $id => $user ) {
 	sort( $user['roles'] );
 	$lines[] = array( 'user', $id, $user['login'], $user['email'], $user['roles'] ? implode( ',', $user['roles'] ) : '(権限なし)' );
+	if ( $detail ) {
+		$lines[] = array( 'user_registered', $id, $user['registered'] . ' (UTC)' );
+	}
 }
 
 // 有効化されているプラグイン
