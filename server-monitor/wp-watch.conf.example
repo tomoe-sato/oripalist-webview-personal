@@ -1,0 +1,37 @@
+# wp-watch の設定。このファイルを wp-watch.conf という名前でコピーして編集してください。
+#   cp ~/wp-watch/wp-watch.conf.example ~/wp-watch/wp-watch.conf
+# wp-watch.conf は Git には入れません（Webhook URL などを書くため）。
+
+# ---- 通知先（1つ以上設定してください。複数設定するとすべてに送ります） ----
+
+# メール（カンマ区切りで複数可）
+MAIL_TO="you@example.com"
+# 差出人（空ならサーバーの既定。迷惑メールに入る場合はサーバーのドメインのアドレスにする）
+MAIL_FROM=""
+
+# Slack の Incoming Webhook URL
+SLACK_WEBHOOK_URL=""
+
+# Discord の Webhook URL
+DISCORD_WEBHOOK_URL=""
+
+# ---- 見回る範囲 ----
+
+# WordPress を探すディレクトリ（空白区切りで複数可）。Xserver はホームの下に全ドメインがあります
+SEARCH_ROOTS="$HOME"
+# 探す深さ（~/ドメイン/public_html/サブドメイン/ まで届けば十分）
+MAX_DEPTH=5
+
+# ~/.ssh/authorized_keys の変更を通知する（1 = する）
+WATCH_SSH_KEYS=1
+# /etc/passwd のユーザー増減を通知する（VPS など root 管理のサーバー向け。共用サーバーでは 0）
+WATCH_OS_USERS=0
+
+# ---- その他 ----
+
+# PHP 7.0 以上で mysqli が使える php。Xserver では既定の php が古い場合があるのでバージョン付きを指定
+# （例: /usr/bin/php8.2。SSH で `ls /usr/bin/php*` を実行すると使えるものが分かります）
+PHP_BIN="php"
+
+# 前回の状態とログの保存先（公開ディレクトリの外にしてください）
+STATE_DIR="$HOME/.wp-watch"

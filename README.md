@@ -99,3 +99,62 @@ Actions タブの「Deploy theme to Xserver」→「Run workflow」から手動�
 
 - サーバー上で削除されたファイルは同期しません（Git から消したファイルはサーバー側で手動削除）。
 - 管理画面のテーマファイルエディターで直接編集した内容は、次回のデプロイで上書きされます。
+
+## サーバー監視（不正プラグイン・不正ユーザーの検知）
+
+`server-monitor/` は Xserver 上で cron 実行する監視スクリプトです。サーバー内の **すべての WordPress**（ホーム以下の全ドメイン・サブドメイン）を5分ごとに見回り、前回から変化があればメール / Slack / Discord に通知します。
+
+| 検知するもの | 見ている場所 |
+|---|---|
+| プラグインの追加・削除 | `wp-content/plugins/` のフォルダ |
+| 管理画面に出ないプラグイン | `wp-content/mu-plugins/`、`wp-content/` 直下の PHP（`object-cache.php` などのドロップイン） |
+| プラグインの有効化・無効化 | DB の `active_plugins` |
+| ユーザーの追加・削除・権限変更・メール変更 | DB の `users` / `usermeta`（管理者の追加は「⚠ 管理者」と表示） |
+| SSH で入れる鍵の追加 | `~/.ssh/authorized_keys` |
+| WordPress 自体の追加・削除 | ホーム以下の `wp-settings.php` |
+
+- WordPress を読み込まずにファイルと DB を直接見るため、不正プラグインが管理画面や wp-cli から自分や作った管理者を隠していても検知できます。
+- 初回は現在の状態を記録するだけで、通知はしません。通知が送れなかった場合は状態を更新せず、次回もう一度通知します。
+- DB に接続できないなど状態を取得できないときは、その旨を1回だけ通知します。
+
+### 設置（SSH で1回だけ）
+
+1. **ファイルを置く** — `main` に入ると GitHub Actions が `~/wp-watch/` に配置します（Actions の「Run workflow」で今すぐ配置も可）。
+2. **SSH でログインして設定を作る**
+
+   ```sh
+   ssh -p 10022 サーバーID@sv12345.xserver.jp
+   ls /usr/bin/php*                                   # 使える PHP を確認（例: /usr/bin/php8.2）
+   cp ~/wp-watch/wp-watch.conf.example ~/wp-watch/wp-watch.conf
+   vi ~/wp-watch/wp-watch.conf                        # MAIL_TO / SLACK_WEBHOOK_URL / PHP_BIN などを設定
+   chmod 600 ~/wp-watch/wp-watch.conf
+   ```
+
+3. **動作確認**
+
+   ```sh
+   bash ~/wp-watch/wp-watch.sh --test   # 通知が届くか
+   bash ~/wp-watch/wp-watch.sh --show   # 検出したサイト・プラグイン・ユーザーの一覧
+   bash ~/wp-watch/wp-watch.sh          # 初回の状態を記録（この時点の状態が「正しい状態」になる）
+   ```
+
+   `--show` の一覧に見覚えのないプラグイン・ユーザー・鍵がないか、**初回記録の前に必ず確認**してください（すでに侵入されている場合、その状態が基準になってしまいます）。
+
+4. **cron に登録** — サーバーパネル →「Cron 設定」で、分 `*/5`・時 `*`・日 `*`・月 `*`・曜日 `*`、コマンドに次を設定します。
+
+   ```
+   /bin/bash /home/サーバーID/wp-watch/wp-watch.sh
+   ```
+
+   Cron 設定の「通知用メールアドレス」を入れておくと、Webhook が届かない場合でも cron の出力メールで差分が届きます。
+
+### 通知が来たら
+
+- 心当たりがあれば（自分でプラグインを入れた等）対応は不要です。次回からはその状態が基準になります。
+- 心当たりがない場合は、該当のプラグインを無効化・削除、ユーザーを削除し、残りの管理者のパスワード変更、`authorized_keys` の不要な鍵の削除を行ってください。
+- 変化の履歴は `~/.wp-watch/changes.log`、実行ログは `~/.wp-watch/wp-watch.log` にあります。基準を作り直すときは `~/.wp-watch/snapshots/` を削除して手順3をやり直します。
+
+### 注意
+
+- このスクリプトは PHP と同じユーザー権限で動くため、サーバーを完全に乗っ取られた場合は止められる可能性があります。通知が外部（メール・Slack）に飛ぶ時点で検知の目的は果たせますが、定期的に `~/.wp-watch/wp-watch.log` が更新されているかも確認してください。
+- 既存プラグインのファイル改ざんは対象外です。必要に応じて `wp plugin verify-checksums --all` などを併用してください。
