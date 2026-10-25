@@ -126,23 +126,18 @@
    ======================================== */
 .oripa-tcg-filter {
 	display: flex;
+	flex-wrap: wrap;
 	gap: 8px;
 	margin: 0 0 1rem;
-	padding: 2px 0 4px;
-	overflow-x: auto;
-	scrollbar-width: none;
-}
-
-.oripa-tcg-filter::-webkit-scrollbar {
-	display: none;
 }
 
 .oripa-tcg-filter__btn {
-	flex: 0 0 auto;
+	flex: 0 1 auto;
 	display: flex;
 	align-items: center;
+	justify-content: center;
 	min-height: 40px;
-	padding: 0 16px;
+	padding: 0 14px;
 	font-size: 0.8125rem;
 	font-weight: 700;
 	line-height: 1;
