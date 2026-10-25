@@ -292,6 +292,13 @@ while ( have_posts() ) :
 							<?php endforeach; ?>
 						</div>
 					<?php endif; ?>
+
+					<?php if ( $app_search_url ) : ?>
+						<a href="<?php echo esc_url( $app_search_url ); ?>" class="oripashop-app-search">
+							ショップページの商品一覧を見る
+							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2.2"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+						</a>
+					<?php endif; ?>
 				</section>
 
 				<div class="oripashop-body">
@@ -452,13 +459,6 @@ while ( have_posts() ) :
 						</div>
 					<?php endif; ?>
 
-					<?php if ( $app_search_url && ! $shop_products_html ) : ?>
-						<a href="<?php echo esc_url( $app_search_url ); ?>" class="oripashop-app-search">
-							ショップページの商品一覧を見る
-							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2.2"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
-						</a>
-					<?php endif; ?>
-
 					<?php if ( $shop_products_html ) : ++$section_num; ?>
 						<section class="oripashop-section oripashop-section--products">
 							<h2 class="oripashop-section__title">
@@ -469,12 +469,6 @@ while ( have_posts() ) :
 							// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- oripa_get_shop_products_listing() 内でエスケープ済み
 							echo $shop_products_html;
 							?>
-							<?php if ( $app_search_url ) : ?>
-							<a href="<?php echo esc_url( $app_search_url ); ?>" class="oripashop-app-search">
-								ショップページの商品一覧を見る
-								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2.2"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
-							</a>
-							<?php endif; ?>
 							<script>
 							(function () {
 								var list = document.getElementById('oripashop-products');
