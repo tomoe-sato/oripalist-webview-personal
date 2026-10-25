@@ -55,7 +55,7 @@ swell_child/
 | URL | 内容 | テンプレート |
 |---|---|---|
 | `/shop/` | ショップ一覧 | `archive-shop.php` |
-| `/product/` | 商品（オリパ）一覧 | `archive-product.php` |
+| `/product/` | 新着オリパ（公開日が新しい順） | `archive-product.php` |
 | `/product/?event=1` | 「イベント中」が ON の商品一覧 | `archive-product.php` |
 | `/tags/タグのスラッグ/` | 商品タグごとの商品一覧 | `taxonomy-tags.php` |
 
@@ -79,8 +79,8 @@ swell_child/
 
 - `[oripa_product id="投稿ID"]` … 商品カードを1件表示
 - `[oripa_products type="オリパタイプのスラッグ" limit="6"]` … オリパタイプ別の商品カード一覧
-- `[oripa_shortcuts]` … トップページのショートカット（初心者向け・高還元・イベント・コラム・確率計算・人気ショップ）
-  - 「初心者向け」「高還元」は同名の商品タグの一覧へリンクします。タグがない項目は表示されません。
+- `[oripa_shortcuts]` … トップページのショートカット（初心者向け・新着・イベント・コラム・確率計算・人気ショップ）
+  - 「初心者向け」は同名の商品タグの一覧へリンクします。タグがない、またはタグの付いた商品が0件の場合は表示されません。
   - コラムのリンク先は `ORIPA_COLUMN_URL`（初期値 `/column/`）です。
 
 ## 自動デプロイ（GitHub Actions → Xserver）
