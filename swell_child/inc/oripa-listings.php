@@ -39,6 +39,7 @@ add_action( 'init', function () {
  */
 add_filter( 'query_vars', function ( $vars ) {
 	$vars[] = 'event';
+	$vars[] = 'tcg';
 	return $vars;
 } );
 
@@ -50,6 +51,20 @@ add_action( 'pre_get_posts', function ( $query ) {
 	if ( $query->is_post_type_archive( 'product' ) || $query->is_tax( ORIPA_TAXONOMY_TAG ) ) {
 		$query->set( 'posts_per_page', ORIPA_LIST_PER_PAGE );
 		$query->set( 'post_type', 'product' );
+
+		$tcg = oripa_current_tcg( $query );
+		if ( $tcg ) {
+			$query->set(
+				'tax_query',
+				[
+					[
+						'taxonomy' => 'tcgtitle',
+						'field'    => 'slug',
+						'terms'    => $tcg,
+					],
+				]
+			);
+		}
 
 		if ( $query->is_post_type_archive( 'product' ) && $query->get( 'event' ) ) {
 			$query->set(
@@ -77,16 +92,116 @@ add_action( 'pre_get_posts', function ( $query ) {
 } );
 
 /**
+ * 選択中のTCGタイトル（?tcg=スラッグ）。絞り込み対象外の値は無視する
+ *
+ * @param WP_Query|null $query クエリ（省略時はメインクエリ）
+ * @return string
+ */
+function oripa_current_tcg( $query = null ) {
+	$tcg = $query ? (string) $query->get( 'tcg' ) : (string) get_query_var( 'tcg' );
+	return array_key_exists( $tcg, oripa_tcg_filters() ) ? $tcg : '';
+}
+
+/**
+ * 商品一覧のTCGタイトル切り替えボタン
+ *
+ * 今の一覧（イベント中・商品タグ）の条件のまま、TCGタイトルごとの件数を数え、
+ * 該当する商品があるタイトルだけボタンを出す。
+ *
+ * @return string
+ */
+function oripa_get_tcg_filter_html() {
+	$is_event = (bool) get_query_var( 'event' );
+	$base_tax = [];
+
+	if ( is_tax( ORIPA_TAXONOMY_TAG ) ) {
+		$term     = get_queried_object();
+		$base_url = get_term_link( $term );
+		$base_tax = [
+			[
+				'taxonomy' => ORIPA_TAXONOMY_TAG,
+				'field'    => 'term_id',
+				'terms'    => $term->term_id,
+			],
+		];
+	} else {
+		$base_url = get_post_type_archive_link( 'product' );
+	}
+	if ( is_wp_error( $base_url ) || ! $base_url ) {
+		return '';
+	}
+	if ( $is_event ) {
+		$base_url = add_query_arg( 'event', '1', $base_url );
+	}
+
+	$buttons = [];
+	foreach ( oripa_tcg_filters() as $slug => $label ) {
+		$args = [
+			'post_type'      => 'product',
+			'post_status'    => 'publish',
+			'posts_per_page' => 1,
+			'fields'         => 'ids',
+			'tax_query'      => array_merge(
+				$base_tax,
+				[
+					[
+						'taxonomy' => 'tcgtitle',
+						'field'    => 'slug',
+						'terms'    => $slug,
+					],
+				]
+			),
+		];
+		if ( $is_event ) {
+			$args['meta_query'] = [
+				[
+					'key'   => 'イベント中',
+					'value' => '1',
+				],
+			];
+		}
+		$count = ( new WP_Query( $args ) )->found_posts;
+		if ( $count > 0 ) {
+			$buttons[ $slug ] = $label;
+		}
+	}
+
+	if ( ! $buttons ) {
+		return '';
+	}
+
+	$current = oripa_current_tcg();
+	$items   = [ '' => 'すべて' ] + $buttons;
+
+	ob_start();
+	?>
+	<nav class="oripa-tcg-filter" aria-label="TCGタイトルで絞り込む">
+		<?php foreach ( $items as $slug => $label ) : ?>
+			<?php $url = '' === $slug ? $base_url : add_query_arg( 'tcg', $slug, $base_url ); ?>
+			<a class="oripa-tcg-filter__btn<?php echo $slug === $current ? ' is-active' : ''; ?>" href="<?php echo esc_url( $url ); ?>"<?php echo $slug === $current ? ' aria-current="page"' : ''; ?>><?php echo esc_html( $label ); ?></a>
+		<?php endforeach; ?>
+	</nav>
+	<?php
+	return ob_get_clean();
+}
+
+/**
  * 商品一覧（商品アーカイブ・商品タグ）を商品カードで表示
  *
  * @param string $title 見出し
  */
 function oripa_render_product_archive( $title ) {
+	$tcg = oripa_current_tcg();
+	if ( $tcg ) {
+		$title .= '（' . oripa_tcg_filters()[ $tcg ] . '）';
+	}
+
 	get_header();
 	?>
 	<main id="main_content" class="l-mainContent l-article oripa-list-page">
 		<div class="l-mainContent__inner">
 			<h1 class="oripa-list-page__title"><?php echo esc_html( $title ); ?></h1>
+			<?php echo oripa_get_tcg_filter_html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- 関数内でエスケープ済み ?>
 			<?php if ( have_posts() ) : ?>
 				<div class="oripa-cards">
 					<?php
