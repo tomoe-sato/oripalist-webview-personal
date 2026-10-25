@@ -36,6 +36,36 @@
 	padding: 0.75rem 1rem 1rem;
 }
 
+/* 一覧でカードの高さを揃え、在庫数・価格・ボタンをカードの下端に揃える
+   （タグの有無や行数でカードごとに位置がずれないように） */
+.oripa-cards .oripa-card,
+.oripa-cards .oripa-card-slot {
+	display: flex;
+	flex-direction: column;
+}
+
+.oripa-cards .oripa-card-slot > .oripa-card {
+	flex: 1 1 auto;
+}
+
+/* ショップ詳細の「もっと見る」・TCG絞り込みで隠したカードは表示しない */
+.oripa-cards .oripa-card-slot[hidden],
+.oripa-cards .oripa-card-slot.is-hidden,
+.oripa-cards .oripa-card-slot.is-filtered-out {
+	display: none;
+}
+
+.oripa-cards .oripa-card__body {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+}
+
+.oripa-cards .oripa-card__body > .oripa-card__tags + *,
+.oripa-cards .oripa-card__body > :first-child:not(.oripa-card__tags) {
+	margin-top: auto;
+}
+
 .oripa-card__tags {
 	display: flex;
 	flex-wrap: wrap;
