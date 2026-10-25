@@ -51,6 +51,14 @@ add_action( 'pre_get_posts', function ( $query ) {
 	if ( $query->is_post_type_archive( 'product' ) || $query->is_tax( ORIPA_TAXONOMY_TAG ) ) {
 		$query->set( 'posts_per_page', ORIPA_LIST_PER_PAGE );
 		$query->set( 'post_type', 'product' );
+		// 新着順（公開日が新しい順、同じ日時なら後から登録したもの）
+		$query->set(
+			'orderby',
+			[
+				'date' => 'DESC',
+				'ID'   => 'DESC',
+			]
+		);
 
 		$tcg = oripa_current_tcg( $query );
 		if ( $tcg ) {
@@ -263,14 +271,14 @@ function oripa_get_shop_card_html( $post_id ) {
  * トップページのショートカット項目
  *
  * 商品タグは名前で探すため、スラッグが何であっても動く。
- * 該当するタグが見つからない項目は表示しない。
+ * タグが見つからない、またはタグの付いた商品が0件の項目は表示しない。
  *
  * @return array<int, array{label:string, url:string, icon:string}>
  */
 function oripa_get_shortcut_items() {
 	$tag_url = function ( $name ) {
 		$term = get_term_by( 'name', $name, ORIPA_TAXONOMY_TAG );
-		if ( ! $term ) {
+		if ( ! $term || 0 === (int) $term->count ) {
 			return '';
 		}
 		$link = get_term_link( $term );
@@ -284,9 +292,9 @@ function oripa_get_shortcut_items() {
 			'icon'  => '<path d="M3 5l9 3 9-3v13l-9 3-9-3z"/><path d="M12 8v13"/>',
 		],
 		[
-			'label' => '高還元',
-			'url'   => $tag_url( '高還元' ),
-			'icon'  => '<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>',
+			'label' => '新着',
+			'url'   => get_post_type_archive_link( 'product' ),
+			'icon'  => '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
 		],
 		[
 			'label' => 'イベント',
