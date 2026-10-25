@@ -71,6 +71,7 @@ while ( have_posts() ) :
 
 	$shop_intro          = oripa_format_acf_display_value( get_field( 'ショップ紹介', $the_id ) );
 	$shop_url            = get_field( '公式サイト', $the_id ); // ※ACFに未登録の場合はフィールド名を変更
+	$app_search_url      = oripa_get_app_shop_search_url( $the_id );
 
 	$display_title = get_the_title();
 
@@ -451,6 +452,13 @@ while ( have_posts() ) :
 						</div>
 					<?php endif; ?>
 
+					<?php if ( $app_search_url && ! $shop_products_html ) : ?>
+						<a href="<?php echo esc_url( $app_search_url ); ?>" class="oripashop-app-search">
+							ショップページの商品一覧を見る
+							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2.2"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+						</a>
+					<?php endif; ?>
+
 					<?php if ( $shop_products_html ) : ++$section_num; ?>
 						<section class="oripashop-section oripashop-section--products">
 							<h2 class="oripashop-section__title">
@@ -461,6 +469,12 @@ while ( have_posts() ) :
 							// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- oripa_get_shop_products_listing() 内でエスケープ済み
 							echo $shop_products_html;
 							?>
+							<?php if ( $app_search_url ) : ?>
+							<a href="<?php echo esc_url( $app_search_url ); ?>" class="oripashop-app-search">
+								ショップページの商品一覧を見る
+								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2.2"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+							</a>
+							<?php endif; ?>
 							<script>
 							(function () {
 								var list = document.getElementById('oripashop-products');
@@ -1151,6 +1165,32 @@ while ( have_posts() ) :
 }
 .oripashop-more:hover {
 	background: #fff7f0;
+}
+.oripashop-app-search {
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.4rem;
+	width: 100%;
+	min-height: 52px;
+	margin-top: 1rem;
+	padding: 0.9rem 1.25rem;
+	font-size: 0.9375rem;
+	font-weight: 700;
+	line-height: 1.4;
+	color: #fff;
+	text-decoration: none;
+	background: #0069E1;
+	border-radius: 12px;
+	box-shadow: 0 4px 0 #004FDE;
+}
+.oripashop-app-search:hover {
+	color: #fff;
+}
+.oripashop-app-search:active {
+	transform: translateY(3px);
+	box-shadow: 0 1px 0 #004FDE;
 }
 .oripashop-more:disabled {
 	opacity: 0.6;

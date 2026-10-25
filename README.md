@@ -76,6 +76,11 @@ swell_child/
 - 見出しのパリスのポーズは、`paris-heading` に加えて `paris-heading--search`（虫めがね）/ `--excited`（ワクワク）/ `--think`（考え中）/ `--surprise`（びっくり）を付けると変わります。何も付けなければにっこりです。
 - セリフは `inc/paris.php` の `paris_hero_lines()` で変更できます。画像は `assets/paris/` にあります。
 
+## ショップページからアプリへのリンク
+
+ショップの ACF に「アプリショップID」（フィールド名 `アプリショップID`、テキスト）を入れると、ショップページに「ショップページの商品一覧を見る」ボタンが出ます。
+リンク先はアプリ内の検索画面 `orist://search?filters[shopIds]=<アプリショップID>&sort=recommended` です。未入力のショップにはボタンを出しません。
+
 ## ショートコード
 
 - `[oripa_product id="投稿ID"]` … 商品カードを1件表示
