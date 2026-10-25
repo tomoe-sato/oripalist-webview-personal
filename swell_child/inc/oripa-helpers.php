@@ -14,6 +14,22 @@ if ( ! defined( 'ORIPA_SHOP_PRODUCTS_PER_PAGE' ) ) {
 	define( 'ORIPA_SHOP_PRODUCTS_PER_PAGE', 5 );
 }
 
+if ( ! function_exists( 'oripa_tcg_filters' ) ) {
+	/**
+	 * 絞り込みボタンに使うTCGタイトル（タクソノミー tcgtitle のスラッグ => 表示名）
+	 *
+	 * @return array<string, string>
+	 */
+	function oripa_tcg_filters() {
+		return [
+			'pokeca'   => 'ポケカ',
+			'onepiece' => 'ワンピース',
+			'yugioh'   => '遊戯王',
+			'hobby'    => 'ホビー',
+		];
+	}
+}
+
 if ( ! function_exists( 'oripa_format_acf_display_value' ) ) {
 	/**
 	 * ACFフィールド値を表示用文字列に変換
@@ -101,12 +117,7 @@ if ( ! function_exists( 'oripa_get_shop_products_listing' ) ) {
 			return $empty;
 		}
 
-		$filters = [
-			'pokeca'   => 'ポケカ',
-			'onepiece' => 'ワンピース',
-			'yugioh'   => '遊戯王',
-			'hobby'    => 'ホビー',
-		];
+		$filters = oripa_tcg_filters();
 		$counts  = array_fill_keys( array_keys( $filters ), 0 );
 		$items   = [];
 

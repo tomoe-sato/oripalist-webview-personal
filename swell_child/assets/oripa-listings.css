@@ -120,3 +120,42 @@
 	font-weight: 700;
 	color: #0069E1;
 }
+
+/* ========================================
+   商品一覧のTCGタイトル切り替えボタン
+   ======================================== */
+.oripa-tcg-filter {
+	display: flex;
+	gap: 8px;
+	margin: 0 0 1rem;
+	padding: 2px 0 4px;
+	overflow-x: auto;
+	scrollbar-width: none;
+}
+
+.oripa-tcg-filter::-webkit-scrollbar {
+	display: none;
+}
+
+.oripa-tcg-filter__btn {
+	flex: 0 0 auto;
+	display: flex;
+	align-items: center;
+	min-height: 40px;
+	padding: 0 16px;
+	font-size: 0.8125rem;
+	font-weight: 700;
+	line-height: 1;
+	color: #333;
+	text-decoration: none;
+	white-space: nowrap;
+	background: #fff;
+	border: 1px solid #FFDAB3;
+	border-radius: 999px;
+}
+
+.oripa-tcg-filter__btn.is-active {
+	color: #1f2430;
+	background: #FFAB00;
+	border-color: #FFAB00;
+}
