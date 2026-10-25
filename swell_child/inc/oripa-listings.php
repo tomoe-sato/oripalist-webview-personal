@@ -10,6 +10,10 @@ if ( ! defined( 'ORIPA_COLUMN_URL' ) ) {
 	define( 'ORIPA_COLUMN_URL', home_url( '/column/' ) ); // コラム記事一覧ページのURL
 }
 
+if ( ! defined( 'ORIPA_BEGINNER_MAX_PRICE' ) ) {
+	define( 'ORIPA_BEGINNER_MAX_PRICE', 500 ); // 初心者向け（低価格）のオリパの上限価格
+}
+
 if ( ! defined( 'ORIPA_LIST_PER_PAGE' ) ) {
 	define( 'ORIPA_LIST_PER_PAGE', 20 );
 }
@@ -40,6 +44,7 @@ add_action( 'init', function () {
 add_filter( 'query_vars', function ( $vars ) {
 	$vars[] = 'event';
 	$vars[] = 'tcg';
+	$vars[] = 'price_max';
 	return $vars;
 } );
 
@@ -74,16 +79,11 @@ add_action( 'pre_get_posts', function ( $query ) {
 			);
 		}
 
-		if ( $query->is_post_type_archive( 'product' ) && $query->get( 'event' ) ) {
-			$query->set(
-				'meta_query',
-				[
-					[
-						'key'   => 'イベント中',
-						'value' => '1',
-					],
-				]
-			);
+		if ( $query->is_post_type_archive( 'product' ) ) {
+			$meta_query = oripa_product_meta_query( (bool) $query->get( 'event' ), oripa_current_price_max( $query ) );
+			if ( $meta_query ) {
+				$query->set( 'meta_query', $meta_query );
+			}
 		}
 	}
 
@@ -98,6 +98,52 @@ add_action( 'pre_get_posts', function ( $query ) {
 		);
 	}
 } );
+
+/**
+ * 価格の上限（?price_max=500）。0以下や数字以外は無視する
+ *
+ * @param WP_Query|null $query クエリ（省略時はメインクエリ）
+ * @return int 上限なしは 0
+ */
+function oripa_current_price_max( $query = null ) {
+	$value = $query ? $query->get( 'price_max' ) : get_query_var( 'price_max' );
+	return max( 0, absint( $value ) );
+}
+
+/**
+ * 商品一覧の ACF 条件（イベント中・価格の上限）
+ *
+ * @param bool $is_event  イベント中の商品だけにする
+ * @param int  $price_max 価格の上限（0 は上限なし）
+ * @return array
+ */
+function oripa_product_meta_query( $is_event, $price_max ) {
+	$meta_query = [];
+
+	if ( $is_event ) {
+		$meta_query[] = [
+			'key'   => 'イベント中',
+			'value' => '1',
+		];
+	}
+
+	if ( $price_max > 0 ) {
+		// 価格が未入力の商品（数値比較で0扱いになる）は除く
+		$meta_query[] = [
+			'key'     => '価格',
+			'value'   => '',
+			'compare' => '!=',
+		];
+		$meta_query[] = [
+			'key'     => '価格',
+			'value'   => $price_max,
+			'compare' => '<=',
+			'type'    => 'NUMERIC',
+		];
+	}
+
+	return $meta_query;
+}
 
 /**
  * 選択中のTCGタイトル（?tcg=スラッグ）。絞り込み対象外の値は無視する
@@ -119,8 +165,9 @@ function oripa_current_tcg( $query = null ) {
  * @return string
  */
 function oripa_get_tcg_filter_html() {
-	$is_event = (bool) get_query_var( 'event' );
-	$base_tax = [];
+	$is_event  = (bool) get_query_var( 'event' );
+	$price_max = oripa_current_price_max();
+	$base_tax  = [];
 
 	if ( is_tax( ORIPA_TAXONOMY_TAG ) ) {
 		$term     = get_queried_object();
@@ -141,6 +188,10 @@ function oripa_get_tcg_filter_html() {
 	if ( $is_event ) {
 		$base_url = add_query_arg( 'event', '1', $base_url );
 	}
+	if ( $price_max ) {
+		$base_url = add_query_arg( 'price_max', $price_max, $base_url );
+	}
+	$meta_query = is_tax( ORIPA_TAXONOMY_TAG ) ? [] : oripa_product_meta_query( $is_event, $price_max );
 
 	$buttons = [];
 	foreach ( oripa_tcg_filters() as $slug => $label ) {
@@ -160,13 +211,8 @@ function oripa_get_tcg_filter_html() {
 				]
 			),
 		];
-		if ( $is_event ) {
-			$args['meta_query'] = [
-				[
-					'key'   => 'イベント中',
-					'value' => '1',
-				],
-			];
+		if ( $meta_query ) {
+			$args['meta_query'] = $meta_query;
 		}
 		$count = ( new WP_Query( $args ) )->found_posts;
 		if ( $count > 0 ) {
@@ -270,25 +316,14 @@ function oripa_get_shop_card_html( $post_id ) {
 /**
  * トップページのショートカット項目
  *
- * 商品タグは名前で探すため、スラッグが何であっても動く。
- * タグが見つからない、またはタグの付いた商品が0件の項目は表示しない。
  *
  * @return array<int, array{label:string, url:string, icon:string}>
  */
 function oripa_get_shortcut_items() {
-	$tag_url = function ( $name ) {
-		$term = get_term_by( 'name', $name, ORIPA_TAXONOMY_TAG );
-		if ( ! $term || 0 === (int) $term->count ) {
-			return '';
-		}
-		$link = get_term_link( $term );
-		return is_wp_error( $link ) ? '' : $link;
-	};
-
 	$items = [
 		[
 			'label' => '初心者向け',
-			'url'   => $tag_url( '初心者向け' ),
+			'url'   => add_query_arg( 'price_max', ORIPA_BEGINNER_MAX_PRICE, get_post_type_archive_link( 'product' ) ),
 			'icon'  => '<path d="M3 5l9 3 9-3v13l-9 3-9-3z"/><path d="M12 8v13"/>',
 		],
 		[

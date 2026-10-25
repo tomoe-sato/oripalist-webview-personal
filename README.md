@@ -57,6 +57,7 @@ swell_child/
 | `/shop/` | ショップ一覧 | `archive-shop.php` |
 | `/product/` | 新着オリパ（公開日が新しい順） | `archive-product.php` |
 | `/product/?event=1` | 「イベント中」が ON の商品一覧 | `archive-product.php` |
+| `/product/?price_max=500` | 初心者向け（価格 500 円以下）の商品一覧 | `archive-product.php` |
 | `/tags/タグのスラッグ/` | 商品タグごとの商品一覧 | `taxonomy-tags.php` |
 
 商品一覧・商品タグ一覧には、TCG タイトル（ポケカ・ワンピース・遊戯王・ホビー）の切り替えボタンが出ます。入りきらない場合は折り返して表示します。`?tcg=pokeca` のように絞り込み、該当する商品がないタイトルのボタンは表示しません。
@@ -80,7 +81,7 @@ swell_child/
 - `[oripa_product id="投稿ID"]` … 商品カードを1件表示
 - `[oripa_products type="オリパタイプのスラッグ" limit="6"]` … オリパタイプ別の商品カード一覧
 - `[oripa_shortcuts]` … トップページのショートカット（初心者向け・新着・イベント・コラム・確率計算・人気ショップ）
-  - 「初心者向け」は同名の商品タグの一覧へリンクします。タグがない、またはタグの付いた商品が0件の場合は表示されません。
+  - 「初心者向け」は価格 500 円以下の商品一覧（`/product/?price_max=500`）へリンクします。上限は `ORIPA_BEGINNER_MAX_PRICE` で変更できます。価格が未入力の商品は含みません。
   - コラムのリンク先は `ORIPA_COLUMN_URL`（初期値 `/column/`）です。
 
 ## 自動デプロイ（GitHub Actions → Xserver）
