@@ -317,37 +317,51 @@ function oripa_get_shop_card_html( $post_id ) {
  * トップページのショートカット項目
  *
  *
- * @return array<int, array{label:string, url:string, icon:string}>
+ * group は oripa（オリパ一覧）/ tool（便利な機能）
+ *
+ * @return array<int, array{group:string, label:string, desc:string, url:string, icon:string}>
  */
 function oripa_get_shortcut_items() {
 	$items = [
 		[
+			'group' => 'oripa',
 			'label' => '初心者向け',
+			'desc'  => '500円以下',
 			'url'   => add_query_arg( 'price_max', ORIPA_BEGINNER_MAX_PRICE, get_post_type_archive_link( 'product' ) ),
 			'icon'  => '<path d="M3 5l9 3 9-3v13l-9 3-9-3z"/><path d="M12 8v13"/>',
 		],
 		[
+			'group' => 'oripa',
 			'label' => '新着',
+			'desc'  => '新しく追加',
 			'url'   => get_post_type_archive_link( 'product' ),
 			'icon'  => '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
 		],
 		[
+			'group' => 'oripa',
 			'label' => 'イベント',
+			'desc'  => '開催中',
 			'url'   => add_query_arg( 'event', '1', get_post_type_archive_link( 'product' ) ),
 			'icon'  => '<rect x="3" y="8" width="18" height="13" rx="1"/><path d="M3 12h18M12 8v13"/><path d="M12 8c-2-4-6-4-6-1s6 1 6 1c0 0 6 2 6-1s-4-3-6 1z"/>',
 		],
 		[
+			'group' => 'tool',
 			'label' => 'コラム',
+			'desc'  => '攻略・解説',
 			'url'   => ORIPA_COLUMN_URL,
 			'icon'  => '<path d="M4 4h6a2 2 0 0 1 2 2v14a2 2 0 0 0-2-2H4z"/><path d="M20 4h-6a2 2 0 0 0-2 2v14a2 2 0 0 1 2-2h6z"/>',
 		],
 		[
+			'group' => 'tool',
 			'label' => '確率計算',
+			'desc'  => '当たり確率',
 			'url'   => home_url( '/probability/' ),
 			'icon'  => '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8"/><path d="M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/>',
 		],
 		[
+			'group' => 'tool',
 			'label' => '人気ショップ',
+			'desc'  => 'ショップ一覧',
 			'url'   => get_post_type_archive_link( 'shop' ),
 			'icon'  => '<path d="M3 9l2-5h14l2 5"/><path d="M4 9v11h16V9"/><path d="M3 9h18"/><path d="M10 20v-6h4v6"/>',
 		],
@@ -374,16 +388,40 @@ function oripa_shortcuts_shortcode() {
 		return '';
 	}
 
+	$groups = [
+		'oripa' => 'オリパをさがす',
+		'tool'  => 'べんりな機能',
+	];
+
 	ob_start();
 	?>
 	<nav class="oripa-shortcuts" aria-label="ショートカット">
-		<?php foreach ( $items as $item ) : ?>
-			<a class="oripa-shortcuts__item" href="<?php echo esc_url( $item['url'] ); ?>">
-				<svg class="oripa-shortcuts__icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<?php echo $item['icon']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- 固定のSVGパス ?>
-				</svg>
-				<span><?php echo esc_html( $item['label'] ); ?></span>
-			</a>
+		<?php foreach ( $groups as $group => $group_label ) : ?>
+			<?php
+			$group_items = array_filter(
+				$items,
+				function ( $item ) use ( $group ) {
+					return $item['group'] === $group;
+				}
+			);
+			if ( ! $group_items ) {
+				continue;
+			}
+			?>
+			<div class="oripa-shortcuts__group oripa-shortcuts__group--<?php echo esc_attr( $group ); ?>">
+				<p class="oripa-shortcuts__group-label"><?php echo esc_html( $group_label ); ?></p>
+				<div class="oripa-shortcuts__grid">
+					<?php foreach ( $group_items as $item ) : ?>
+						<a class="oripa-shortcuts__item" href="<?php echo esc_url( $item['url'] ); ?>">
+							<svg class="oripa-shortcuts__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+								<?php echo $item['icon']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- 固定のSVGパス ?>
+							</svg>
+							<span class="oripa-shortcuts__label"><?php echo esc_html( $item['label'] ); ?></span>
+							<span class="oripa-shortcuts__desc"><?php echo esc_html( $item['desc'] ); ?></span>
+						</a>
+					<?php endforeach; ?>
+				</div>
+			</div>
 		<?php endforeach; ?>
 	</nav>
 	<?php

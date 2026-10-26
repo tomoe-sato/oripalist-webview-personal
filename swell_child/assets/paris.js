@@ -27,7 +27,7 @@
         }
 
         var img = hero.querySelector('.paris-hero__img');
-        var bubble = hero.querySelector('.paris-hero__bubble');
+        var text = hero.querySelector('.paris-hero__text');
         var button = hero.querySelector('.paris-hero__paris');
         var dots = hero.querySelectorAll('.paris-hero__dot');
         var current = 0;
@@ -42,7 +42,7 @@
         function show(i) {
             current = i;
             img.src = lines[i].img;
-            bubble.textContent = lines[i].text;
+            text.textContent = lines[i].text;
             Array.prototype.forEach.call(dots, function (dot, j) {
                 dot.classList.toggle('is-current', j === i);
             });
