@@ -328,7 +328,8 @@ function oripa_get_shortcut_items() {
 			'label' => '初心者向け',
 			'desc'  => '500円以下',
 			'url'   => add_query_arg( 'price_max', ORIPA_BEGINNER_MAX_PRICE, get_post_type_archive_link( 'product' ) ),
-			'icon'  => '<path d="M3 5l9 3 9-3v13l-9 3-9-3z"/><path d="M12 8v13"/>',
+			// 初心者マーク（若葉マーク）。左が黄色、右が緑
+			'icon'  => '<path d="M12 6.5 4.5 2.5v12.5L12 21.5z" fill="#FFD400" stroke="none"/><path d="M12 6.5l7.5-4v12.5L12 21.5z" fill="#00A040" stroke="none"/>',
 		],
 		[
 			'group' => 'oripa',
@@ -390,7 +391,7 @@ function oripa_shortcuts_shortcode() {
 
 	$groups = [
 		'oripa' => 'オリパをさがす',
-		'tool'  => 'べんりな機能',
+		'tool'  => '便利な機能',
 	];
 
 	ob_start();
