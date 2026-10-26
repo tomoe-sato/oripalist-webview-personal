@@ -72,12 +72,14 @@ function paris_hero_shortcode() {
 	ob_start();
 	?>
 	<section class="paris-hero" data-paris-lines="<?php echo esc_attr( wp_json_encode( $data ) ); ?>">
-		<p class="paris-hero__label">パリスの今日のひとこと</p>
 		<div class="paris-hero__body">
 			<button type="button" class="paris-hero__paris" aria-label="パリスに話しかける">
-				<img class="paris-hero__img" src="<?php echo esc_url( $data[0]['img'] ); ?>" alt="パリス" width="136" height="150">
+				<img class="paris-hero__img" src="<?php echo esc_url( $data[0]['img'] ); ?>" alt="パリス" width="104" height="112">
 			</button>
-			<p class="paris-hero__bubble" aria-live="polite"><?php echo esc_html( $data[0]['text'] ); ?></p>
+			<div class="paris-hero__bubble">
+				<p class="paris-hero__label">パリスの今日のひとこと</p>
+				<p class="paris-hero__text" aria-live="polite"><?php echo esc_html( $data[0]['text'] ); ?></p>
+			</div>
 		</div>
 		<?php if ( count( $data ) > 1 ) : ?>
 			<div class="paris-hero__dots" aria-hidden="true">

@@ -31,36 +31,22 @@
    パリスのあいさつ [paris_hero]
    ======================================== */
 .paris-hero {
-	margin: 0 0 1.5rem;
-	padding: 18px 14px 14px;
+	margin: 0 0 1.25rem;
+	padding: 10px 12px 8px;
 	background: #FFF3E7;
 	border-radius: 20px;
 }
 
-.paris-hero__label {
-	display: inline-block;
-	margin: 0;
-	padding: 3px 10px;
-	font-size: 0.75rem;
-	font-weight: 700;
-	line-height: 1.4;
-	color: #3d2a1a;
-	background: #fff;
-	border: 2px solid #FF7100;
-	border-radius: 999px;
-}
-
 .paris-hero__body {
 	display: flex;
-	align-items: flex-end;
-	gap: 2px;
-	margin-top: 10px;
+	align-items: center;
+	gap: 4px;
 }
 
 .paris-hero__paris {
 	flex: 0 0 auto;
-	width: 136px;
-	height: 150px;
+	width: 104px;
+	height: 112px;
 	padding: 0;
 	cursor: pointer;
 	background: transparent;
@@ -69,8 +55,8 @@
 
 .paris-hero__img {
 	display: block;
-	width: 136px;
-	height: 150px;
+	width: 104px;
+	height: 112px;
 	object-fit: contain;
 	object-position: bottom;
 }
@@ -82,15 +68,28 @@
 .paris-hero__bubble {
 	position: relative;
 	flex: 1 1 auto;
-	margin: 0 0 46px;
-	padding: 12px 14px;
-	font-size: 0.9375rem;
-	font-weight: 700;
-	line-height: 1.5;
-	color: #1f2430;
+	min-width: 0;
+	margin: 0 0 0 8px;
+	padding: 8px 12px 10px;
 	background: #fff;
 	border: 3px solid #3d2a1a;
 	border-radius: 16px;
+}
+
+.paris-hero__label {
+	margin: 0 0 2px;
+	font-size: 0.6875rem;
+	font-weight: 700;
+	line-height: 1.4;
+	color: #F54A00;
+}
+
+.paris-hero__text {
+	margin: 0;
+	font-size: 0.875rem;
+	font-weight: 700;
+	line-height: 1.5;
+	color: #1f2430;
 }
 
 /* 吹き出しのしっぽ（外枠と内側の2枚重ね） */
@@ -105,15 +104,17 @@
 }
 
 .paris-hero__bubble::before {
-	bottom: 14px;
+	top: 50%;
 	left: -12px;
+	transform: translateY(-50%);
 	border-width: 9px 12px 9px 0;
 	border-right-color: #3d2a1a;
 }
 
 .paris-hero__bubble::after {
-	bottom: 16px;
+	top: 50%;
 	left: -7px;
+	transform: translateY(-50%);
 	border-width: 7px 9px 7px 0;
 	border-right-color: #fff;
 }
@@ -122,7 +123,7 @@
 	display: flex;
 	justify-content: center;
 	gap: 6px;
-	margin-top: 8px;
+	margin-top: 2px;
 }
 
 .paris-hero__dot {
@@ -214,7 +215,7 @@
 	display: flex;
 	align-items: center;
 	gap: 6px;
-	margin: 2em 0 0.75em;
+	margin: 1.5em 0 0.5em;
 	padding: 0;
 	font-size: 1.125rem;
 	font-weight: 800;
