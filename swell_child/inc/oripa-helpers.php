@@ -24,7 +24,14 @@ if ( ! function_exists( 'oripa_get_app_shop_search_url' ) ) {
 	 * @return string
 	 */
 	function oripa_get_app_shop_search_url( $shop_post_id ) {
-		$app_shop_id = trim( (string) get_field( 'アプリショップID', $shop_post_id ) );
+		// ACF はラベルの英字を小文字にしてフィールド名を作るため、どちらの名前でも読む
+		$app_shop_id = '';
+		foreach ( [ 'アプリショップID', 'アプリショップid' ] as $field_name ) {
+			$app_shop_id = trim( (string) get_field( $field_name, $shop_post_id ) );
+			if ( '' !== $app_shop_id ) {
+				break;
+			}
+		}
 		if ( '' === $app_shop_id ) {
 			return '';
 		}
