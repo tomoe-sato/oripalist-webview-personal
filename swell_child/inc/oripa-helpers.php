@@ -14,6 +14,25 @@ if ( ! defined( 'ORIPA_SHOP_PRODUCTS_PER_PAGE' ) ) {
 	define( 'ORIPA_SHOP_PRODUCTS_PER_PAGE', 5 );
 }
 
+if ( ! function_exists( 'oripa_get_app_shop_search_url' ) ) {
+	/**
+	 * アプリ内の検索画面（ショップで絞り込み・おすすめ順）を開くURL
+	 *
+	 * ショップの ACF「アプリショップID」を使う。未入力の場合は空文字。
+	 *
+	 * @param int $shop_post_id ショップ投稿ID
+	 * @return string
+	 */
+	function oripa_get_app_shop_search_url( $shop_post_id ) {
+		$app_shop_id = trim( (string) get_field( 'アプリショップID', $shop_post_id ) );
+		if ( '' === $app_shop_id ) {
+			return '';
+		}
+
+		return 'orist://search?filters[shopIds]=' . rawurlencode( $app_shop_id ) . '&sort=recommended';
+	}
+}
+
 if ( ! function_exists( 'oripa_tcg_filters' ) ) {
 	/**
 	 * 絞り込みボタンに使うTCGタイトル（タクソノミー tcgtitle のスラッグ => 表示名）
